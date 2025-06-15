@@ -1,5 +1,4 @@
 import React from 'react';
-import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
 
 function ExportControls({ conversation, isLoading }) {
@@ -7,121 +6,80 @@ function ExportControls({ conversation, isLoading }) {
     if (!conversation || isLoading) return;
 
     try {
-      // Créer un élément temporaire pour le contenu à exporter
-      const exportContent = document.createElement('div');
-      exportContent.style.width = '210mm'; // A4 width
-      exportContent.style.padding = '20mm';
-      exportContent.style.fontFamily = 'Arial, sans-serif';
-      exportContent.style.fontSize = '12px';
-      exportContent.style.lineHeight = '1.5';
-      exportContent.style.color = '#333';
-      exportContent.style.background = 'white';
-      exportContent.style.position = 'absolute';
-      exportContent.style.left = '-9999px';
-      exportContent.style.top = '0';
-
-      // Ajouter le titre
-      const title = document.createElement('h1');
-      title.textContent = `Conversation Steam - ${conversation.participant}`;
-      title.style.fontSize = '18px';
-      title.style.marginBottom = '20px';
-      title.style.textAlign = 'center';
-      title.style.borderBottom = '2px solid #333';
-      title.style.paddingBottom = '10px';
-      exportContent.appendChild(title);
-
-      // Ajouter les informations de la conversation
-      const info = document.createElement('div');
-      info.style.marginBottom = '30px';
-      info.style.fontSize = '11px';
-      info.style.color = '#666';
-      info.innerHTML = `
-        <p><strong>Participant:</strong> ${conversation.participant}</p>
-        <p><strong>Nombre de messages:</strong> ${conversation.messages.length}</p>
-        <p><strong>Date d'export:</strong> ${new Date().toLocaleDateString('fr-FR')}</p>
-      `;
-      exportContent.appendChild(info);
-
-      // Ajouter les messages
-      conversation.messages.forEach((message, index) => {
-        const messageDiv = document.createElement('div');
-        messageDiv.style.marginBottom = '15px';
-        messageDiv.style.padding = '10px';
-        messageDiv.style.border = '1px solid #ddd';
-        messageDiv.style.borderRadius = '5px';
-        messageDiv.style.backgroundColor = '#f9f9f9';
-        messageDiv.style.pageBreakInside = 'avoid';
-        
-        // Obtenir la couleur du participant
-        const participantIndex = conversation.participants.indexOf(message.author);
-        const colors = [
-          '#667eea', '#48bb78', '#ed8936', '#e53e3e', '#9f7aea',
-          '#38b2ac', '#d69e2e', '#f56565', '#4299e1', '#68d391'
-        ];
-        const participantColor = colors[participantIndex % colors.length];
-        messageDiv.style.borderLeft = `4px solid ${participantColor}`;
-
-        const header = document.createElement('div');
-        header.style.display = 'flex';
-        header.style.justifyContent = 'space-between';
-        header.style.marginBottom = '5px';
-        header.style.fontWeight = 'bold';
-        header.style.fontSize = '11px';
-
-        const author = document.createElement('span');
-        author.textContent = message.author;
-        author.style.color = participantColor;
-
-        const time = document.createElement('span');
-        time.textContent = `${message.date} ${message.time}`;
-        time.style.color = '#666';
-        time.style.fontFamily = 'monospace';
-
-        header.appendChild(author);
-        header.appendChild(time);
-
-        const text = document.createElement('div');
-        text.textContent = message.text;
-        text.style.wordWrap = 'break-word';
-        text.style.color = '#555';
-
-        messageDiv.appendChild(header);
-        messageDiv.appendChild(text);
-        exportContent.appendChild(messageDiv);
-      });
-
-      document.body.appendChild(exportContent);
-
-      // Convertir en canvas puis en PDF
-      const canvas = await html2canvas(exportContent, {
-        scale: 2,
-        useCORS: true,
-        allowTaint: true,
-        backgroundColor: '#ffffff'
-      });
-
-      document.body.removeChild(exportContent);
-
-      const imgData = canvas.toDataURL('image/png');
       const pdf = new jsPDF('p', 'mm', 'a4');
+      const pageWidth = 190; // A4 width minus margins
+      const pageHeight = 270; // A4 height minus margins
+      let yPosition = 20;
       
-      const imgWidth = 210; // A4 width in mm
-      const pageHeight = 295; // A4 height in mm
-      const imgHeight = (canvas.height * imgWidth) / canvas.width;
-      let heightLeft = imgHeight;
-      let position = 0;
+      // Couleurs des participants
+      const colors = [
+        [102, 126, 234], [72, 187, 120], [237, 137, 54], [229, 62, 62], [159, 122, 234],
+        [56, 178, 172], [214, 158, 46], [245, 101, 101], [66, 153, 225], [104, 211, 145]
+      ];
 
-      // Ajouter la première page
-      pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-      heightLeft -= pageHeight;
+      // Titre
+      pdf.setFontSize(18);
+      pdf.setFont('helvetica', 'bold');
+      pdf.text(`Conversation Steam - ${conversation.participant}`, 105, yPosition, { align: 'center' });
+      yPosition += 15;
 
-      // Ajouter des pages supplémentaires si nécessaire
-      while (heightLeft >= 0) {
-        position = heightLeft - imgHeight;
-        pdf.addPage();
-        pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-        heightLeft -= pageHeight;
-      }
+      // Informations
+      pdf.setFontSize(10);
+      pdf.setFont('helvetica', 'normal');
+      pdf.setTextColor(100, 100, 100);
+      pdf.text(`Participant: ${conversation.participant}`, 20, yPosition);
+      yPosition += 5;
+      pdf.text(`Nombre de messages: ${conversation.messages.length}`, 20, yPosition);
+      yPosition += 5;
+      pdf.text(`Date d'export: ${new Date().toLocaleDateString('fr-FR')}`, 20, yPosition);
+      yPosition += 15;
+
+      // Messages
+      conversation.messages.forEach((message, index) => {
+        // Vérifier si on doit créer une nouvelle page
+        if (yPosition > pageHeight - 30) {
+          pdf.addPage();
+          yPosition = 20;
+        }
+
+        // Couleur du participant
+        const participantIndex = conversation.participants.indexOf(message.author);
+        const color = colors[participantIndex % colors.length];
+        
+        // Rectangle coloré à gauche
+        pdf.setFillColor(color[0], color[1], color[2]);
+        pdf.rect(15, yPosition - 3, 3, 15, 'F');
+
+        // En-tête du message
+        pdf.setFontSize(9);
+        pdf.setFont('helvetica', 'bold');
+        pdf.setTextColor(color[0], color[1], color[2]);
+        pdf.text(message.author, 25, yPosition);
+        
+        pdf.setFont('helvetica', 'normal');
+        pdf.setTextColor(120, 120, 120);
+        pdf.text(`${message.date} ${message.time}`, pageWidth - 30, yPosition);
+
+        yPosition += 7;
+
+        // Contenu du message
+        pdf.setFontSize(9);
+        pdf.setTextColor(50, 50, 50);
+        pdf.setFont('helvetica', 'normal');
+        
+        // Découper le texte en lignes pour qu'il rentre dans la page
+        const lines = pdf.splitTextToSize(message.text, pageWidth - 15);
+        lines.forEach(line => {
+          if (yPosition > pageHeight - 10) {
+            pdf.addPage();
+            yPosition = 20;
+          }
+          pdf.text(line, 25, yPosition);
+          yPosition += 5;
+        });
+
+        yPosition += 5; // Espacement entre messages
+      });
 
       // Télécharger le PDF
       const fileName = `conversation-steam-${conversation.participant.replace(/[^a-zA-Z0-9]/g, '-')}-${new Date().toISOString().split('T')[0]}.pdf`;
