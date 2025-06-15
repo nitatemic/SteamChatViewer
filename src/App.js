@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './App.css';
 import FileUploader from './components/FileUploader';
 import ChatViewer from './components/ChatViewer';
@@ -9,6 +9,25 @@ function App() {
   const [conversation, setConversation] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [isDarkMode, setIsDarkMode] = useState(() => {
+    // Récupérer la préférence sauvegardée ou utiliser la préférence système
+    const savedTheme = localStorage.getItem('darkMode');
+    if (savedTheme) {
+      return JSON.parse(savedTheme);
+    }
+    return window.matchMedia('(prefers-color-scheme: dark)').matches;
+  });
+
+  useEffect(() => {
+    // Sauvegarder la préférence dans localStorage
+    localStorage.setItem('darkMode', JSON.stringify(isDarkMode));
+    // Appliquer la classe au body
+    document.body.className = isDarkMode ? 'dark-mode' : '';
+  }, [isDarkMode]);
+
+  const toggleDarkMode = () => {
+    setIsDarkMode(!isDarkMode);
+  };
 
   const handleFileUpload = async (file) => {
     setIsLoading(true);
@@ -27,10 +46,21 @@ function App() {
   };
 
   return (
-    <div className="app">
+    <div className={`app ${isDarkMode ? 'dark-mode' : ''}`}>
       <header className="header">
-        <h1>Steam Chat Viewer</h1>
-        <p>Convertissez vos conversations Steam en documents élégants</p>
+        <div className="header-content">
+          <div>
+            <h1>Steam Chat Viewer</h1>
+            <p>Convertissez vos conversations Steam en documents élégants</p>
+          </div>
+          <button 
+            className="theme-toggle"
+            onClick={toggleDarkMode}
+            aria-label={isDarkMode ? 'Basculer en mode clair' : 'Basculer en mode sombre'}
+          >
+            {isDarkMode ? '☀️' : '🌙'}
+          </button>
+        </div>
       </header>
 
       <div className="container">

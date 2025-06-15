@@ -29,6 +29,38 @@ body {
   padding: 2rem 1rem;
 }
 
+.header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 1200px;
+  margin: 0 auto;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.theme-toggle {
+  background: rgba(255, 255, 255, 0.2);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+}
+
+.theme-toggle:hover {
+  background: rgba(255, 255, 255, 0.3);
+  border-color: rgba(255, 255, 255, 0.5);
+  transform: scale(1.1);
+}
+
 .header h1 {
   font-size: 2.5rem;
   margin-bottom: 0.5rem;
@@ -385,5 +417,109 @@ body {
     margin-bottom: 0.5rem;
     background: #f9f9f9;
     border: 1px solid #ddd;
+  }
+}
+
+/* Dark Mode Styles */
+.dark-mode {
+  background: linear-gradient(135deg, #1a202c 0%, #2d3748 100%);
+  color: #e2e8f0;
+}
+
+.dark-mode .upload-section,
+.dark-mode .chat-section {
+  background: #2d3748;
+  border-color: #4a5568;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.dark-mode .file-upload-area {
+  background: #374151;
+  border-color: #6b7280;
+  color: #d1d5db;
+}
+
+.dark-mode .file-upload-area:hover,
+.dark-mode .file-upload-area.drag-over {
+  background: #4b5563;
+  border-color: #9ca3af;
+}
+
+.dark-mode .upload-icon {
+  color: #6b7280;
+}
+
+.dark-mode .upload-text {
+  color: #e5e7eb;
+}
+
+.dark-mode .upload-subtext {
+  color: #9ca3af;
+}
+
+.dark-mode .chat-header {
+  background: #374151;
+  border-color: #4a5568;
+}
+
+.dark-mode .chat-title {
+  color: #f9fafb;
+}
+
+.dark-mode .chat-info {
+  color: #d1d5db;
+}
+
+.dark-mode .message {
+  background: #374151;
+  color: #e5e7eb;
+}
+
+.dark-mode .message:hover {
+  background: #4b5563;
+}
+
+.dark-mode .message-text {
+  color: #d1d5db;
+}
+
+.dark-mode .message-time {
+  color: #9ca3af;
+}
+
+.dark-mode .btn-secondary {
+  background: #4a5568;
+  color: #e2e8f0;
+}
+
+.dark-mode .btn-secondary:hover {
+  background: #718096;
+}
+
+.dark-mode .error {
+  background: #742a2a;
+  color: #feb2b2;
+  border-left-color: #f56565;
+}
+
+.dark-mode .loading {
+  color: #90cdf4;
+}
+
+.dark-mode .no-messages {
+  color: #a0aec0;
+}
+
+/* Dark mode responsive adjustments */
+@media (max-width: 768px) {
+  .header-content {
+    justify-content: center;
+    text-align: center;
+  }
+  
+  .theme-toggle {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
   }
 }
