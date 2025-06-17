@@ -3,12 +3,18 @@ import './App.css';
 import FileUploader from './components/FileUploader';
 import ChatViewer from './components/ChatViewer';
 import ExportControls from './components/ExportControls';
+import AvatarManager from './components/AvatarManager';
 import { parseSteamChat } from './utils/chatParser';
 
 function App() {
   const [conversation, setConversation] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [avatars, setAvatars] = useState({});
+  const [showAvatars, setShowAvatars] = useState(() => {
+    const savedShowAvatars = localStorage.getItem('showAvatars');
+    return savedShowAvatars ? JSON.parse(savedShowAvatars) : false;
+  });
   const [isDarkMode, setIsDarkMode] = useState(() => {
     // Récupérer la préférence sauvegardée ou utiliser la préférence système
     const savedTheme = localStorage.getItem('darkMode');
@@ -25,8 +31,21 @@ function App() {
     document.body.className = isDarkMode ? 'dark-mode' : '';
   }, [isDarkMode]);
 
+  useEffect(() => {
+    // Sauvegarder la préférence d'affichage des avatars
+    localStorage.setItem('showAvatars', JSON.stringify(showAvatars));
+  }, [showAvatars]);
+
   const toggleDarkMode = () => {
     setIsDarkMode(!isDarkMode);
+  };
+
+  const handleAvatarsChange = (newAvatars) => {
+    setAvatars(newAvatars);
+  };
+
+  const handleToggleAvatars = (show) => {
+    setShowAvatars(show);
   };
 
   const handleFileUpload = async (file) => {
@@ -88,12 +107,23 @@ function App() {
               <ExportControls 
                 conversation={conversation} 
                 isLoading={isLoading}
+                avatars={avatars}
+                showAvatars={showAvatars}
               />
             </div>
+
+            <AvatarManager
+              participants={conversation.participants}
+              onAvatarsChange={handleAvatarsChange}
+              showAvatars={showAvatars}
+              onToggleAvatars={handleToggleAvatars}
+            />
             
             <ChatViewer 
               conversation={conversation} 
               isLoading={isLoading}
+              avatars={avatars}
+              showAvatars={showAvatars}
             />
           </div>
         )}

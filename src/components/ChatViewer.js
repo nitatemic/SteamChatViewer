@@ -1,6 +1,6 @@
 import React from 'react';
 
-const ChatViewer = ({ conversation, isLoading }) => {
+const ChatViewer = ({ conversation, isLoading, avatars = {}, showAvatars = false }) => {
   if (isLoading) {
     return (
       <div className="loading">
@@ -28,13 +28,30 @@ const ChatViewer = ({ conversation, isLoading }) => {
       {conversation.messages.map((message, index) => (
         <div 
           key={index} 
-          className={`message ${getParticipantColorClass(message.author)}`}
+          className={`message ${getParticipantColorClass(message.author)} ${showAvatars ? 'with-avatar' : ''}`}
         >
-          <div className="message-header">
-            <span className="message-author">{message.author}</span>
-            <span className="message-time">{message.date} {message.time}</span>
+          {showAvatars && (
+            <div className="message-avatar">
+              {avatars[message.author] ? (
+                <img 
+                  src={avatars[message.author]} 
+                  alt={`Avatar de ${message.author}`}
+                  className="avatar-image"
+                />
+              ) : (
+                <div className="default-avatar">
+                  {message.author.charAt(0).toUpperCase()}
+                </div>
+              )}
+            </div>
+          )}
+          <div className="message-content">
+            <div className="message-header">
+              <span className="message-author">{message.author}</span>
+              <span className="message-time">{message.date} {message.time}</span>
+            </div>
+            <div className="message-text">{message.text}</div>
           </div>
-          <div className="message-text">{message.text}</div>
         </div>
       ))}
     </div>
