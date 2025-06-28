@@ -183,6 +183,6 @@ We welcome contributions! Here's how you can help:
 
 **Made with ❤️ for the Steam community**
 
-[⭐ Star this repo](https://github.com/yourusername/steam-chat-viewer) if you found it helpful!
+[⭐ Star this repo](https://github.com/nitatemic/SteamChatViewer) if you found it helpful!
 
 </div>
